@@ -51,7 +51,7 @@ Um cenário de \textit{merge} é geralmente composto por dois \textit{commits} \
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{merge.png}
+    \includegraphics[width=0.80\textwidth]{imagens/merge.png}
     \caption{Visualização simplificada de um cenário de integração de diferentes versões de código. O \textit{commit} \textit{merge} é gerado pela integração das modificações introduzidas em \textit{left} e \textit{right}}
     \label{fig:commits}
 \end{figure}
@@ -254,7 +254,7 @@ A ferramenta pode ser estruturada conceitualmente como sendo composta por 4 mód
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.5\textwidth]{arquitetura-velha.png}
+    \includegraphics[width=.5\textwidth]{imagens/arquitetura-velha.png}
     \caption{Diagrama da macro-arquitetura de SMAT.}
     \label{fig:macro-velha}
 \end{figure}
@@ -379,7 +379,7 @@ Conforme discutido previamente, o principal problema arquitetural presente em SM
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{macro.png}
+    \includegraphics[width=\textwidth]{imagens/macro.png}
     \caption{Diagrama da nova macro-arquitetura proposta para SMAT.}
     \label{fig:macro}
 \end{figure}
@@ -395,7 +395,7 @@ A primeira etapa da execução de SMAT consiste da geração de suítes de teste
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{main.png}
+    \includegraphics[width=\textwidth]{imagens/main.png}
     \caption{Diagrama de classes simplificado de SMAT. Na implementação original, a classe abstrata SetupTool mistura aspectos de geração, execução e análise dinâmica. Suas subclasses utilizam \textit{wrappers} para realizar a chamada a cada gerador de testes.}
     \label{fig:main}
 \end{figure}
@@ -404,7 +404,7 @@ Nossa primeira proposta foi a de agrupar todos os conceitos da geração de suí
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{tsg.png}
+    \includegraphics[width=\textwidth]{imagens/tsg.png}
     \caption{Diagrama de classes do módulo de Geração das Suítes de Testes.}
     \label{fig:tsg}
 \end{figure}
@@ -428,7 +428,7 @@ Uma vez que a geração das suítes é concluída, é necessário realizar a exe
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{tse.png}
+    \includegraphics[width=\textwidth]{imagens/tse.png}
     \caption{Diagrama de classes do módulo de Execução das Suítes de Testes.}
     \label{fig:tse}
 \end{figure}
@@ -475,7 +475,7 @@ Neste sentido, nosso primeiro passo é construir um modelo que consiga refletir 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{criteria.png}
+    \includegraphics[width=\textwidth]{imagens/criteria.png}
     \caption{Diagrama de classes da estruturação da análise de conflitos semânticos.}
     \label{fig:criteria}
 \end{figure}
@@ -507,7 +507,7 @@ Uma estratégia similar pode ser utilizada para identificar as mudanças de comp
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{bc.png}
+    \includegraphics[width=\textwidth]{imagens/bc.png}
     \caption{Diagrama de classes da estruturação da análise de mudanças de comportamento.}
     \label{fig:bc}
 \end{figure}
@@ -516,7 +516,7 @@ A fim de simplificar o consumo por parte de seus clientes, as implementações d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{da.png}
+    \includegraphics[width=\textwidth]{imagens/da.png}
     \caption{Diagrama de classes em alto nível do módulo de análise dinâmica.}
     \label{fig:da}
 \end{figure}
@@ -529,7 +529,7 @@ A ferramenta permite a confecção de 3 tipos de relatórios: um com informaçõ
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{relatorios.png}
+    \includegraphics[width=\textwidth]{imagens/relatorios.png}
     \caption{Estrutura de cada um dos relatórios gerados. Cada relatório é composto de uma lista de instâncias destas classes.}
     \label{fig:relatorios}
 \end{figure}
@@ -540,7 +540,7 @@ Como cada relatório possui uma estratégia diferente para sua geração, consul
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{output.png}
+    \includegraphics[width=0.8\textwidth]{imagens/output.png}
     \caption{Diagrama de classes do módulo de geração de relatórios}
     \label{fig:output}
 \end{figure}
@@ -551,7 +551,7 @@ A fim de preservar uma interface comum para os diferentes geradores de relatóri
 
 \begin{figure}[H]
     \centering
-    \includegraphics{ogc.png}
+    \includegraphics{imagens/ogc.png}
     \caption{Diagrama do objeto \textit{OutputGeneratorContext}, que guarda as diversas informações a serem consultadas durante a geração de um relatório.}
     \label{fig:ogc}
 \end{figure}
