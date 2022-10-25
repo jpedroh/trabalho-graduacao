@@ -243,6 +243,41 @@ SMAT então realiza comparações destas especificações em cada versão do  \t
 \end{itemize}
 Como o caso de teste da Figura \ref{fig:teste} passa na versão do código de \textit{right} e falha em \textit{base}, afinal nenhuma validação a respeito do tamanho da \textit{String} é realizada. Embora o teste também falhe em \textit{merge}, a exceção levantada pela validação é pelo fato da \textit{String} de teste possuir comprimento inferior ao permitido, comportamento introduzido por \textit{left}. Este cenário de interferência satisfaz o primeiro critério para detecção de um conflito semântico, sendo então reportado por SMAT ao usuário.
 
+Por outro lado, suponha o cenário da Figura \ref{fig:segundo-criterio} que é o código resultado da integração de duas \textit{branches} diferentes, e as linhas ocultas não modificam o valor da variável \textit{x}. A Figura \ref{fig:segundo-criterio-teste} representa um teste gerado como uma especificação parcial para a modificação introduzida por \textit{right}.
+
+\begin{figure}[H]
+\begin{minted}[linenos]{java}
+public static int some_random_method() {
+  int x = 0;
+  (...)
+  x += 1;
+  (...)
+  x += 1;
+  (...)
+  if (x >= 2) {
+    throw new RuntimeException();
+  }
+  return x;
+}
+\end{minted}
+\caption{Neste cenário, a linha 4 foi introduzida por \textit{left} e a linha 6 por \textit{right}.}
+\label{fig:segundo-criterio}
+\end{figure}
+
+\begin{figure}[H]
+\begin{minted}[linenos]{java}
+@Test(expected = None.class)
+public void test() {
+  int result = RandomClass.some_random_method();
+  assertEquals(10, result);
+}
+\end{minted}
+\caption{Caso de teste de exemplo para a Figura \ref{fig:segundo-criterio}}
+\label{fig:segundo-criterio-teste}
+\end{figure}
+
+É válido observar que, tanto em \textit{base} quanto em ambos os \textit{parents}, o teste da Figura \ref{fig:segundo-criterio-teste} passa (afinal, a variável \textit{x} nunca possui o valor 2). Entretanto, quando integradas, as modificações introduzidas por \textit{left} e \textit{right} acabam fazendo com que a variável \textit{x} assuma o valor 2, lançando uma exceção em tempo de execução e quebrando o teste em \textit{merge}, satisfazendo assim o segundo critério heurístico de SMAT.
+ 
 A fim de evitar que testes que tenham comportamento \textit{flaky}, isto é, que não apresentam resultados consistentes ao longo de várias execuções, possam interferir no resultado fornecido pela ferramenta, SMAT realiza 3 execuções de cada caso de teste, descartando-o na análise na presença de qualquer disparidade entre os resultados.
 
 Outra preocupação existente é com testes que venham a falhar por exercitarem elementos que não estão presentes em alguma versão do código que está sendo analisado - suponha, por exemplo, a introdução ou remoção de um método em algum dos \textit{parents}. Neste contexto, a avaliação seria inconclusiva e, portanto, tais testes são descartados durante a análise.
@@ -254,7 +289,7 @@ A ferramenta pode ser estruturada conceitualmente como sendo composta por 4 mód
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.5\textwidth]{imagens/arquitetura-velha.png}
+    \includegraphics[width=.8\textwidth]{imagens/arquitetura-velha.png}
     \caption{Diagrama da macro-arquitetura de SMAT.}
     \label{fig:macro-velha}
 \end{figure}
@@ -322,7 +357,7 @@ Outro ponto que é válido ressaltar é que, pelo caráter não-determinístico 
 Por último, é importante observar que SMAT não possui anotações de tipos nos elementos utilizados em seu código. Apesar de Python ser uma linguagem que consegue determinar o tipo de suas variáveis somente em tempo de execução, é possível utilizar ferramentas que introduzem anotação de tipos \cite{lehtosalo2021mypy} que podem ser posteriormente analisadas de maneira estática, melhorando significativamente a produtividade \cite{hanenberg2009impact} e a manutenção do \textit{software} \cite{kleinschmager2012static}.
 
 \section{Atacando as lacunas de SMAT}
-Conforme discutido anteriormente, o objetivo deste trabalho é de propor aperfeiçoamentos e soluções para as limitações encontradas na ferramenta SMAT que foram apresentadas anteriormente. Nas seções seguintes, discutiremos as estratégias utilizadas durante este processo.
+Conforme discutido anteriormente, o objetivo deste trabalho é de propor aperfeiçoamentos e soluções para as limitações encontradas em SMAT. Nas seções seguintes, discutimos as estratégias utilizadas durante este processo.
 
 \subsection{Alterando a interface de entrada}
 A primeira proposta ofertada neste trabalho foi a de construir uma nova interface para o fornecimento da lista dos cenários a serem analisados por SMAT com o objetivo de facilitar a utilização da ferramenta pelos seus clientes. Para isto, decidimos alterar a formatação da entrada para utilizar arquivos JSONs, em substituição aos antigos CSVs, para permitir a representação de estruturas mais complexas e substituir notações exclusivas da ferramenta, \textit{e.g.:} a separação de parâmetros dos métodos por caracteres | ao invés do habitual separador (,).
@@ -372,7 +407,7 @@ De fato, é importante observar que, a princípio, o conflito pode ter ocorrido 
     \item Através de uma análise do relatório de cobertura do código fonte durante a execução do teste conflitante no commit de merge, a fim de verificar se ao menos uma linha do método alvo foi invocada durante a execução do teste.
 \end{enumerate}
 
-Aproveitando toda a infraestrutura de coleta e geração de reportes de cobertura de código já implementada em SMAT para outras finalidades, adotamos a estratégia de análise do relatório de cobertura citada anteriormente. Uma consequência interessante desse aperfeiçoamento é que a mesma estratégia pode ser trivialmente utilizada para avaliar a ocorrência de falsos positivos como descritos por \cite{leuson:tese}: a situação em que nem \textit{x()} e nem \textit{y()} são executados pelo teste. Desta forma, nossa ferramenta pode dar uma resposta mais significativa para os seus usuários.
+A fim de aproveitar a infraestrutura de coleta e geração de reportes de cobertura de código já implementada em SMAT para outras finalidades, adotamos a estratégia de análise do relatório de cobertura citada anteriormente, mesmo que esta introduza um custo devido a instrumentação do código e da coleta de cobertura em si. Uma consequência interessante desse aperfeiçoamento é que a mesma estratégia pode ser trivialmente utilizada para avaliar a ocorrência de falsos positivos como descritos por \cite{leuson:tese}: a situação em que nem \textit{x()} e nem \textit{y()} são executados pelo teste. Desta forma, nossa ferramenta pode dar uma resposta mais significativa para os seus usuários.
 
 \subsection{Arquitetura}
 Conforme discutido previamente, o principal problema arquitetural presente em SMAT é o acoplamento existente entre os módulos de geração das suítes, execução dos testes e análise dinâmica. Desta forma, realizamos a reestruturação dos módulos conforme mostra a Figura \ref{fig:macro}, a fim de permitir a evolução independente destes contextos da aplicação.
@@ -580,7 +615,11 @@ A introdução de uma interface que permitisse que uma mesma execução de SMAT 
 
 Como trabalhos teóricos futuros, temos como principal horizonte a expansão de SMAT para que ela seja capaz de atender outros projetos para além da linguagem Java. Vale ressaltar aqui que tal expansão depende da existência de ferramentas que sejam capazes de realizar a geração de testes automáticos para diferentes linguagens, e que estas ferramentas ainda estão em desenvolvimento dentro da literatura.	
 
-A nível de implementação, uma das principais necessidades consiste no aumento da cobertura de testes automatizados da aplicação. É importante ressaltar que com o advento das execuções determinísticas implementadas neste trabalho, é possível construir valiosas suítes de testes de integração que podem, com baixo custo de desenvolvimento, serem capazes de encontrar com facilidade possíveis regressões em tarefas de desenvolvimento futuras.
+Outro campo de exploração é verificar os ganhos introduzidos com as nossas contribuições como, por exemplo, analisando se houve melhora na performance da ferramenta, ou verificar como a  nova estratégia de detecção de falsos positivos comporta-se na prática em um cenário real.
+
+A nível de implementação, é importante observar que SMAT é apenas uma ferramenta do arcabouço produzido pelo trabalho de \cite{leuson:tese}. Desta forma, como a ferramenta é consumida por outros clientes, é importante que estes clientes sejam atualizados para utilizar as novas interfaces providas por SMAT. No momento, as interfaces antigas ainda são suportadas, mas foram depreciadas, podendo ser removidas em futuras versões da ferramenta.
+
+Outro aspecto relevante para o projeto é o de aumentar a cobertura de testes automatizados da aplicação. É importante ressaltar que com o advento das execuções determinísticas implementadas neste trabalho, é possível construir valiosas suítes de testes de integração que podem, com baixo custo de desenvolvimento, serem capazes de encontrar com facilidade possíveis regressões em tarefas de desenvolvimento futuras.
 
 Além disso, o isolamento da execução dos geradores de suítes de testes permite explorar possibilidades de execução da geração em paralelo. Embora uma análise menos criteriosa aponte para a possibilidade de um ganho de performance, é necessário considerar como este comportamento influenciaria a qualidade e o tempo disponível para a geração de cada uma das suítes, especialmente quando utilizando a busca exploratória limitada por tempo.
 
